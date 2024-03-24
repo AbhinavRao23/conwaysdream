@@ -5,14 +5,16 @@ from matplotlib.animation import FuncAnimation
 import jax
 import jax.numpy as jnp
 
+HEIGHT = 50
+WIDTH = 50
+P = 0.25
 ASSET_DIR = 'assets'
 
 _at = lambda arr, i,j : jax.lax.dynamic_slice(arr, (i,j), (1,1))[0][0]
 
-
-def conway_ij(i, j, grid):
+def n_live_neighbors(i, j, grid):
     height, width = grid.shape
-    live_neighbors = _at(grid, i-1, j-1)\
+    return _at(grid, i-1, j-1)\
                   +  _at(grid, i, j-1)\
                   +  _at(grid, (i+1)%height, j-1)\
                   +  _at(grid, i-1 , j)\
@@ -20,7 +22,10 @@ def conway_ij(i, j, grid):
                   +  _at(grid, i-1, (j+1)%width)\
                   +  _at(grid, i, (j+1)%width)\
                   +  _at(grid, (i+1)%height, (j+1)%width)
-    
+
+
+def conway_ij(i, j, grid):
+    live_neighbors = n_live_neighbors(i, j, grid)
     return jax.lax.cond((_at(grid, i, j) == 1.),
                         lambda x: jax.lax.cond(((live_neighbors<2.) | (live_neighbors>3.)),
                                                lambda y: jnp.array(0.), 
@@ -66,12 +71,8 @@ def animate_life(grids, title='game of life'):
 if __name__ == '__main__':
     key = jax.random.PRNGKey(0)
     generations = 100
-    height = 50
-    width = 50
-    p = 0.25
-
     key, grid_key = jax.random.split(key)
     grid0 = jax.random.choice(grid_key, jnp.array([1.,0.],dtype=jnp.float32), 
-                              shape=(height,width), p=jnp.array((p, 1-p)))
+                              shape=(HEIGHT,WIDTH), p=jnp.array((P, 1-P)))
     grids = simulate(grid0, generations)
     animate_life(grids, 'Game of Life')

@@ -21,13 +21,13 @@ branch = eqx.nn.MLP(HEIGHT*WIDTH, latent_size, 128, 3, key=b_key)
 deeponet = {'t':trunk,'b':branch}
 
 lr = 0.00001
-n = 100 #per curriculum
-n_grids = 32
-n_cells = 16
-max_gen = 10
-n_curriculum = 5
-update_max_gen_by = 10
-reset_optim = True
+n = 1000 #per curriculum
+n_grids = 16
+n_cells = 32
+max_gen = 20
+n_curriculum = 3
+update_max_gen_by = 20
+reset_optim = False
 
 optim = optax.adam(lr)
 opt_state = optim.init(eqx.filter(deeponet, eqx.is_array))

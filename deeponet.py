@@ -13,16 +13,26 @@ HEIGHT = 50
 WIDTH = 50
 P = 0.25
 
+_at = lambda arr, i,j : jax.lax.dynamic_slice(arr, (i,j), (1,1))[0][0]
+
 def evolve_grids(grid0s, till_generations, max_gen):
     def last_gen(grid0, till_generation, max_gen): 
         return simulate(grid0, max_gen)[till_generation] #why does this work
     return jax.vmap(last_gen, in_axes=(0,0,None))(grid0s, till_generations, max_gen)
 
 
+# def evaluate_deeponet_ij(model, i, j, grid):
+#     x, y = i/HEIGHT, j/WIDTH
+#     latent_b = model['b'](grid.flatten())
+#     latent_t = model['t'](jnp.array((x,y)))
+#     return jax.nn.sigmoid(jnp.dot(latent_b, latent_t))
+
+
 def evaluate_deeponet_ij(model, i, j, grid):
-    x, y = i/HEIGHT, j/WIDTH
+    val = _at(grid, i, j)
+    neighbors = n_live_neighbors(i, j, grid)
     latent_b = model['b'](grid.flatten())
-    latent_t = model['t'](jnp.array((x,y)))
+    latent_t = model['t'](jnp.array((val, neighbors)))
     return jax.nn.sigmoid(jnp.dot(latent_b, latent_t))
 
 
