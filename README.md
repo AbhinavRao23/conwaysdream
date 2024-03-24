@@ -1,6 +1,6 @@
 # Deep-O-nets for learning Conway's Game transfer operator
 
-Attempts to train a operator learning model that can learn the transfer operator in Conway's game of life, using JAX. 
+Attempts to train a model that can learn the transfer operator in Conway's game of life, using JAX. 
 
 ## Contents:
 
